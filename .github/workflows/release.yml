@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 1.0.0)"
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install server dependencies
+        run: cd server && npm install --production
+
+      - name: Update version in manifest and package
+        run: |
+          node -e "
+            const fs = require('fs');
+            const version = '${{ github.event.inputs.version }}';
+            for (const file of ['manifest.json', 'server/package.json']) {
+              const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+              pkg.version = version;
+              fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');
+            }
+          "
+
+      - name: Build .mcpb bundle
+        run: npx @anthropic-ai/mcpb pack .
+
+      - name: Rename bundle
+        run: mv *.mcpb vis42.mcpb
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: v${{ github.event.inputs.version }}
+          body: |
+            ## VIS42 Claude Desktop Extension v${{ github.event.inputs.version }}
+
+            ### Installation
+            1. Download `vis42.mcpb` below
+            2. Open Claude Desktop → Settings → Extensions
+            3. Install from file and select `vis42.mcpb`
+            4. Enter your VIS42 API Token when prompted
+          files: vis42.mcpb
+          generate_release_notes: true
