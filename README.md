@@ -16,7 +16,7 @@ Connect Claude to your VIS42 account. Manage counterparts, products, invoices, p
 
 ## Installation
 
-1. Download the latest `vis42.mcpb` file from the [Releases](https://github.com/vis42/vis42-mcpb/releases) page
+1. Download the latest `vis42.mcpb` file from the [Releases](https://github.com/VIS42-SA/com.vis42.mcpb/releases) page
 2. Open **Claude Desktop**
 3. Go to **Settings > Extensions**
 4. Click **"Install from file"** and select the `vis42.mcpb` file
@@ -92,7 +92,7 @@ This extension runs a lightweight local proxy on your machine. When you interact
 ## Building from Source
 
 ```bash
-git clone https://github.com/vis42/vis42-mcpb.git
+git clone https://github.com/VIS42-SA/com.vis42.mcpb.git
 cd vis42-mcpb
 cd server && npm install --production && cd ..
 npx @anthropic-ai/mcpb pack
@@ -100,10 +100,15 @@ npx @anthropic-ai/mcpb pack
 
 This produces a `vis42.mcpb` file in the project root.
 
+## Privacy Policy
+
+This extension connects to the VIS42 remote server to process your requests. Please review our [Privacy Policy](https://vis42.com/privacy-policy) for details on data collection, usage, and retention.
+
 ## Support
 
-If you encounter any issues, please [open an issue](https://github.com/vis42/vis42-mcpb/issues) on GitHub.
+- Email: [support@vis42.com](mailto:support@vis42.com)
+- Issues: [GitHub Issues](https://github.com/VIS42-SA/com.vis42.mcpb/issues)
 
 ## License
 
-MIT
+[MIT](LICENSE)

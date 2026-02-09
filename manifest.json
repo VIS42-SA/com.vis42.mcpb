@@ -5,7 +5,8 @@
   "version": "1.0.0",
   "description": "Connect Claude to your VIS42 account. Manage counterparts, products, invoices, payables, and query your business data via GraphQL.",
   "author": {
-    "name": "VIS42"
+    "name": "VIS42",
+    "url": "https://github.com/VIS42-SA"
   },
   "license": "MIT",
   "server": {
