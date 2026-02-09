@@ -1,0 +1,8 @@
+{
+  "name": "vis42-mcpb",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "pack": "npx @anthropic-ai/mcpb pack"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "manifest_version": "0.3",
+  "name": "vis42",
+  "display_name": "VIS42",
+  "version": "1.0.0",
+  "description": "Connect Claude to your VIS42 account. Manage counterparts, products, invoices, payables, and query your business data via GraphQL.",
+  "author": {
+    "name": "VIS42"
+  },
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "VIS42_API_TOKEN": "${user_config.api_token}"
+      }
+    }
+  },
+  "user_config": {
+    "api_token": {
+      "type": "string",
+      "title": "API Token",
+      "description": "Your VIS42 API bearer token for authentication",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    { "name": "get-schema", "description": "Retrieve the GraphQL schema" },
+    { "name": "query", "description": "Execute a GraphQL query" },
+    { "name": "store-product", "description": "Create a new product or service" },
+    { "name": "update-product", "description": "Update a product or service" },
+    { "name": "destroy-product", "description": "Delete a product or service" },
+    { "name": "store-product-price", "description": "Create a product price" },
+    { "name": "update-product-price", "description": "Update a product price" },
+    { "name": "destroy-product-price", "description": "Delete a product price" },
+    { "name": "store-measure-unit", "description": "Create a measure unit" },
+    { "name": "update-measure-unit", "description": "Update a measure unit" },
+    { "name": "destroy-measure-unit", "description": "Delete a measure unit" },
+    { "name": "store-counterpart-organization", "description": "Create an organization counterpart" },
+    { "name": "store-counterpart-individual", "description": "Create an individual counterpart" },
+    { "name": "update-counterpart-organization", "description": "Update an organization counterpart" },
+    { "name": "update-counterpart-individual", "description": "Update an individual counterpart" },
+    { "name": "destroy-counterpart", "description": "Delete a counterpart" },
+    { "name": "store-counterpart-bank-account", "description": "Add a bank account to a counterpart" },
+    { "name": "update-counterpart-bank-account", "description": "Update a counterpart bank account" },
+    { "name": "destroy-counterpart-bank-account", "description": "Delete a counterpart bank account" },
+    { "name": "store-counterpart-contact", "description": "Add a contact to a counterpart" },
+    { "name": "update-counterpart-contact", "description": "Update a counterpart contact" },
+    { "name": "destroy-counterpart-contact", "description": "Delete a counterpart contact" },
+    { "name": "store-counterpart-vat-id", "description": "Add a VAT ID to a counterpart" },
+    { "name": "update-counterpart-vat-id", "description": "Update a counterpart VAT ID" },
+    { "name": "destroy-counterpart-vat-id", "description": "Delete a counterpart VAT ID" },
+    { "name": "store-counterpart-address", "description": "Add an address to a counterpart" },
+    { "name": "update-counterpart-address", "description": "Update a counterpart address" },
+    { "name": "destroy-counterpart-address", "description": "Delete a counterpart address" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}
