@@ -1,0 +1,90 @@
+name: Sync Tools
+
+on:
+  repository_dispatch:
+    types: [sync-tools]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Update manifest.json tools
+        run: |
+          node -e "
+            const fs = require('fs');
+            const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+            const tools = JSON.parse(process.env.TOOLS_JSON);
+            manifest.tools = tools;
+            fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
+            console.log('Updated manifest.json with ' + tools.length + ' tools');
+          "
+        env:
+          TOOLS_JSON: ${{ toJSON(github.event.client_payload.tools) }}
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet manifest.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit updated manifest
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "sync: update tools from ${{ github.event.client_payload.tag }}"
+          git push
+
+      - name: Install server dependencies
+        if: steps.diff.outputs.changed == 'true'
+        run: cd server && npm install --production
+
+      - name: Update version in manifest and package
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          node -e "
+            const fs = require('fs');
+            const version = '${{ github.event.client_payload.version }}';
+            for (const file of ['manifest.json', 'server/package.json']) {
+              const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+              pkg.version = version;
+              fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');
+            }
+          "
+
+      - name: Build .mcpb bundle
+        if: steps.diff.outputs.changed == 'true'
+        run: npx @anthropic-ai/mcpb pack .
+
+      - name: Rename bundle
+        if: steps.diff.outputs.changed == 'true'
+        run: mv *.mcpb vis42.mcpb
+
+      - name: Create GitHub Release
+        if: steps.diff.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.client_payload.tag }}
+          name: ${{ github.event.client_payload.tag }}
+          body: |
+            ## VIS42 Claude Desktop Extension ${{ github.event.client_payload.tag }}
+
+            ### Installation
+            1. Download `vis42.mcpb` below
+            2. Open Claude Desktop → Settings → Extensions
+            3. Install from file and select `vis42.mcpb`
+            4. Enter your VIS42 API Token when prompted
+          files: vis42.mcpb
+          generate_release_notes: false
