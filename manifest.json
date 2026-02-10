@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "vis42",
   "display_name": "VIS42",
-  "version": "1.0.0",
+  "version": "0.0.7",
   "description": "Connect Claude to your VIS42 account. Manage counterparts, products, invoices, payables, and query your business data via GraphQL.",
   "author": {
     "name": "VIS42",
@@ -57,115 +57,227 @@
   "tools": [
     {
       "description": "Return the complete GraphQL schema in JSON format of the VIS42 app.",
-      "name": "get-schema"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "get-schema",
+      "readOnlyHint": true,
+      "title": "GraphQL Get Schema Tool"
     },
     {
       "description": "Executes a GraphQL query.",
-      "name": "query"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "query",
+      "readOnlyHint": true,
+      "title": "GraphQl Query Tool"
     },
     {
       "description": "Create a new product or service.\nThe Product object represents the specific services, materials, or physical or digital goods sold.\nA business must have at least one product configured in order to create any receivables.\nProducts can be of type \"product\" or \"service\", a product must have at least one default price.\nWhen creating a new product or service, the price defined during creation is automatically set as the default price.\nIn the context of receivables, products are used to define line items, a measure unit is the standard unit used to\nmeasure the quantity of a product or service.",
-      "name": "store-product"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-product",
+      "readOnlyHint": false,
+      "title": "Store a product"
     },
     {
       "description": "Update an existing product or service.",
-      "name": "update-product"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-product",
+      "readOnlyHint": false,
+      "title": "Update a product"
     },
     {
       "description": "Delete an existing product or service.\nA product can only be deleted if it is not associated with any receivables.",
-      "name": "destroy-product"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-product",
+      "readOnlyHint": false,
+      "title": "Destroy a product"
     },
     {
       "description": "Create a new price for a product or service.\nA product can have only one price per currency.\nA product must have at least one price, which is set as the default price.\nOnly one default price is allowed per product.",
-      "name": "store-product-price"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-product-price",
+      "readOnlyHint": false,
+      "title": "Store a product price"
     },
     {
       "description": "Update an existing price for a product or service.",
-      "name": "update-product-price"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-product-price",
+      "readOnlyHint": false,
+      "title": "Update a product price"
     },
     {
       "description": "Delete an existing price for a product or service.\nA price can only be deleted if it is not set as the default price for the product.\nIf the price to be deleted is the default price, another price must first be set as the default price.",
-      "name": "destroy-product-price"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-product-price",
+      "readOnlyHint": false,
+      "title": "Destroy a product-price"
     },
     {
       "description": "Create a new measure unit.\nA measure unit can be associated with multiple products.\nExamples of measure units: meters, kilograms, pieces, hours.",
-      "name": "store-measure-unit"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-measure-unit",
+      "readOnlyHint": false,
+      "title": "Store a measure unit"
     },
     {
       "description": "Update an existing measure unit.",
-      "name": "update-measure-unit"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-measure-unit",
+      "readOnlyHint": false,
+      "title": "Update a measure unit"
     },
     {
       "description": "Delete an existing measure unit.\nA measure unit can only be deleted if it is not associated with any products.",
-      "name": "destroy-measure-unit"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-measure-unit",
+      "readOnlyHint": false,
+      "title": "Destroy a measure unit"
     },
     {
       "description": "Create a new counterpart (supplier or client).\nCounterparts represent the suppliers and clients of a business.\nA counterpart must be created before a business can create receivables and payables.\nThe counterpart's default address is normally used for invoicing and tax purposes, and referenced as billing address in invoices.\nDepending on the counterpart’s country, it may have both tax and VAT IDs or only one of them. In some countries, the tax ID is the same as VAT ID.\nA common compliance requirement for certain transaction types is to include the customer’s tax ID or VAT ID in invoices, if available. For example, intra-EU B2B sales require the customer’s VAT ID in invoices.\nHow to check if tax ID or VAT ID is required: require at least one of tax ID or VAT ID specified. If the counterpart is registered for VAT, we expect that the VAT ID is specified. If the counterpart is not VAT-registered, then tax ID is required.\nWhat is a tax ID:\nAlso referred as Tax Identification Number (TIN), or Fiscal Code.\n- Switzerland (CH):\n    - The UID/IDI/IDE is the tax ID and also the VAT number., E.g., CHE-123.456.789 and CHE-123.456.789 IVA/TVA/MWST\n- Italy (IT):\n    - The Partita IVA is the tax ID and also the VAT number., E.g., 12345678901 and IT12345678901",
-      "name": "store-counterpart-organization"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-counterpart-organization",
+      "readOnlyHint": false,
+      "title": "Store a counterpart organization"
     },
     {
       "description": "Create a new counterpart (supplier or client).\nCounterparts represent the suppliers and clients of a business.\nA counterpart must be created before a business can create receivables and payables.\nThe counterpart's default address is normally used for invoicing and tax purposes, and referenced as billing address in invoices.\nDepending on the counterpart’s country, it may have both tax and VAT IDs or only one of them. In some countries, the tax ID is the same as VAT ID.\nA common compliance requirement for certain transaction types is to include the customer’s tax ID or VAT ID in invoices, if available. For example, intra-EU B2B sales require the customer’s VAT ID in invoices.\nHow to check if tax ID or VAT ID is required: generally do not require a tax ID but may require a VAT ID.\nWhat is a tax ID:\nAlso referred as Tax Identification Number (TIN), or Fiscal Code.\n- Switzerland (CH):\n    - The AVS/OASI number is the tax ID and VAT number defined as 756.XXXX.YYYY.ZZ = 10 numerals., E.g., 756.1234.5678.97\n- Italy (IT):\n    - The Codice Fiscale is the tax ID and VAT number defined as LLLLLL99L99L999L = 6 letters + 2 numerals + 1 letter + 2 numerals + 1 letter + 3 numerals + 1 letter., E.g., RSSMRA85M01H501U",
-      "name": "store-counterpart-individual"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-counterpart-individual",
+      "readOnlyHint": false,
+      "title": "Store a counterpart individual"
     },
     {
       "description": "Update an existing organization counterpart (business).",
-      "name": "update-counterpart-organization"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-counterpart-organization",
+      "readOnlyHint": false,
+      "title": "Update a counterpart organization"
     },
     {
       "description": "Delete an existing counterpart (supplier or client).\nA counterpart can only be deleted if it is not associated with any receivables or payables.",
-      "name": "destroy-counterpart"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-counterpart",
+      "readOnlyHint": false,
+      "title": "Destroy a counterpart"
     },
     {
       "description": "Create a new bank account for a counterpart.\nOnly one default bank account is allowed per counterpart.\nA counterpart can have multiple bank accounts in different currencies.\nOnce a bank account is created in a specific currency, it CANNOT be changed to another currency.",
-      "name": "store-counterpart-bank-account"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-counterpart-bank-account",
+      "readOnlyHint": false,
+      "title": "Store a counterpart bank account"
     },
     {
       "description": "Update an existing bank account for a counterpart.",
-      "name": "update-counterpart-bank-account"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-counterpart-bank-account",
+      "readOnlyHint": false,
+      "title": "Update a counterpart bank account"
     },
     {
       "description": "Update an existing individual counterpart (person).",
-      "name": "update-counterpart-individual"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-counterpart-individual",
+      "readOnlyHint": false,
+      "title": "Update a counterpart individual"
     },
     {
       "description": "Delete an existing bank account for a counterpart.",
-      "name": "destroy-counterpart-bank-account"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-counterpart-bank-account",
+      "readOnlyHint": false,
+      "title": "Destroy a counterpart bank account"
     },
     {
       "description": "Create a new contact for a counterpart.\nA counterpart can have multiple contacts.\nContacts are normally used when a counterpart is an organization, and the contacts are the individuals\nworking at that organization.",
-      "name": "store-counterpart-contact"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-counterpart-contact",
+      "readOnlyHint": false,
+      "title": "Store a counterpart contact"
     },
     {
       "description": "Update an existing contact for a counterpart.",
-      "name": "update-counterpart-contact"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-counterpart-contact",
+      "readOnlyHint": false,
+      "title": "Update a counterpart contact"
     },
     {
       "description": "Delete an existing contact for a counterpart.",
-      "name": "destroy-counterpart-contact"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-counterpart-contact",
+      "readOnlyHint": false,
+      "title": "Destroy a counterpart contact"
     },
     {
       "description": "Create a new VAT ID for a counterpart.\nA counterpart can have multiple VAT IDs.\nA VAT ID (Value Added Tax Identification Number) is a unique government-issued identification number used for\ntax purposes, specifically for value-added tax. It is assigned to counterparts and helps authorities track and\nmanage tax-related transactions.\nCurrently, VIS42 supports the following VAT ID types:\n| Country              | Type         | Description                                                                                             | Example                |\n| -------------------- | ------------ | ------------------------------------------------------------------------------------------------------- | ---------------------- |\n| Australia            | `au_abn`     | Australian Business Number (AU ABN)                                                                     | *51824753556*          |\n| Australia            | `au_arn`     | Australian Taxation Office Reference Number                                                             | *518247535567*         |\n| Austria              | `eu_vat`     | European VAT number                                                                                     | *ATU12345678*          |\n| Belgium              | `eu_vat`     | European VAT number                                                                                     | *BE0123456789*         |\n| Brazil               | `br_cnpj`    | Brazilian CNPJ number                                                                                   | *28.271.211/0001-88*   |\n| Brazil               | `br_cpf`     | Brazilian CPF number                                                                                    | *137.609.391-04*       |\n| Bulgaria             | `bg_uic`     | Bulgaria Unified Identification Code                                                                    | *123456789*            |\n| Bulgaria             | `eu_vat`     | European VAT number                                                                                     | *BG0123456789*         |\n| Canada               | `ca_bn`      | Canadian BN                                                                                             | *123456789*            |\n| Canada               | `ca_gst_hst` | Canadian GST/HST number                                                                                 | *123456789RT0002*      |\n| Canada               | `ca_pst_bc`  | Canadian PST number (British Columbia)                                                                  | *PST-1234-5678*        |\n| Canada               | `ca_pst_mb`  | Canadian PST number (Manitoba)                                                                          | *123456-7*             |\n| Canada               | `ca_pst_sk`  | Canadian PST number (Saskatchewan)                                                                      | *1234567*              |\n| Canada               | `ca_qst`     | Canadian QST number (Québec)                                                                            | *1234567890TQ1234*     |\n| Chile                | `cl_tin`     | Chilean TIN                                                                                             | *12.345.678-K*         |\n| Croatia              | `eu_vat`     | European VAT number                                                                                     | *HR12345678912*        |\n| Cyprus               | `eu_vat`     | European VAT number                                                                                     | *CY12345678Z*          |\n| Czech Republic       | `eu_vat`     | European VAT number                                                                                     | *CZ1234567890*         |\n| Denmark              | `eu_vat`     | European VAT number                                                                                     | *DK12345678*           |\n| Estonia              | `eu_vat`     | European VAT number                                                                                     | *EE123456789*          |\n| European Union       | `eu_oss_vat` | European One Stop Shop VAT number for non-Union scheme                                                  | *EU123456789*          |\n| Finland              | `eu_vat`     | European VAT number                                                                                     | *FI12345678*           |\n| France               | `eu_vat`     | European VAT number                                                                                     | *FRAB123456789*        |\n| Georgia              | `ge_vat`     | Georgian VAT                                                                                            | *123456789*            |\n| Germany              | `eu_vat`     | European VAT number                                                                                     | *DE123456789*          |\n| Greece               | `eu_vat`     | European VAT number                                                                                     | *EL123456789*          |\n| Hong Kong            | `hk_br`      | Hong Kong BR number                                                                                     | *12345678*             |\n| Hungary              | `hu_tin`     | Hungary tax number (adószám)                                                                            | *12345678-1-23*        |\n| Hungary              | `eu_vat`     | European VAT number                                                                                     | *HU12345678912*        |\n| Iceland              | `is_vat`     | Icelandic VAT                                                                                           | *123456*               |\n| India                | `in_gst`     | Indian GST number                                                                                       | *12ABCDE3456FGZH*      |\n| Indonesia            | `id_npwp`    | Indonesian NPWP number                                                                                  | *12.345.678.9-012.345* |\n| Ireland              | `eu_vat`     | European VAT number                                                                                     | *IE1234567AB*          |\n| Israel               | `il_vat`     | Israel VAT                                                                                              | *12345*                |\n| Italy                | `eu_vat`     | European VAT number                                                                                     | *IT12345678912*        |\n| Japan                | `jp_cn`      | Japanese Corporate Number (Hōjin Bangō)                                                                 | *1234567891234*        |\n| Japan                | `jp_rn`      | Japanese Registered Foreign Businesses' Registration Number (Tōroku Kokugai Jigyōsha no Tōroku Bangō)   | *12345*                |\n| Kenya                | `unknown`    | Kenya Revenue Authority Personal Identification Number (PIN)                                            | *P123456789X*          |\n| Latvia               | `eu_vat`     | European VAT number                                                                                     | *LV12345678912*        |\n| Liechtenstein        | `li_uid`     | Liechtensteinian UID number                                                                             | *CHE123456789*         |\n| Lithuania            | `eu_vat`     | European VAT number                                                                                     | *LT123456789123*       |\n| Luxembourg           | `eu_vat`     | European VAT number                                                                                     | *LU12345678*           |\n| Malaysia             | `my_frp`     | Malaysian FRP number                                                                                    | *12345678*             |\n| Malaysia             | `my_itn`     | Malaysian ITN                                                                                           | *C 1234567890*         |\n| Malaysia             | `my_sst`     | Malaysian SST number                                                                                    | *A12-3456-78912345*    |\n| Malta                | `eu_vat`     | European VAT number                                                                                     | *MT12345678*           |\n| Mexico               | `mx_rfc`     | Mexican RFC number                                                                                      | *ABC010203AB9*         |\n| Netherlands          | `eu_vat`     | European VAT number                                                                                     | *NL123456789B12*       |\n| New Zealand          | `nz_gst`     | New Zealand GST number                                                                                  | *123456789*            |\n| Norway               | `no_vat`     | Norwegian VAT number                                                                                    | *123456789MVA*         |\n| Pakistan             | `unknown`    | Pakistan National Tax Number (NTN) or Registration Number. Same value as the counterpart's `tax_id`.    | *4174941-3*            |\n| Philippines          | `unknown`    | Philippines Taxpayer Identification Number (TIN), if it's registered for VAT.                           | *000123456001*         |\n| Poland               | `eu_vat`     | European VAT number                                                                                     | *PL1234567890*         |\n| Portugal             | `eu_vat`     | European VAT number                                                                                     | *PT123456789*          |\n| Romania              | `eu_vat`     | European VAT number                                                                                     | *RO1234567891*         |\n| Russia               | `ru_inn`     | Russian INN                                                                                             | *1234567891*           |\n| Russia               | `ru_kpp`     | Russian KPP                                                                                             | *123456789*            |\n| Saudi Arabia         | `sa_vat`     | Saudi Arabia VAT                                                                                        | *123456789012345*      |\n| Singapore            | `sg_gst`     | Singaporean GST                                                                                         | *M12345678X*           |\n| Singapore            | `sg_uen`     | Singaporean UEN                                                                                         | *123456789F*           |\n| Slovakia             | `eu_vat`     | European VAT number                                                                                     | *SK1234567891*         |\n| Slovenia             | `si_tin`     | Slovenia tax number (davčna številka)                                                                   | *12345678*             |\n| Slovenia             | `eu_vat`     | European VAT number                                                                                     | *SI12345678*           |\n| South Africa         | `za_vat`     | South African VAT number                                                                                | *4123456789*           |\n| South Korea          | `kr_brn`     | Korean BRN                                                                                              | *123-45-67890*         |\n| Spain                | `es_cif`     | Spanish NIF number (previously Spanish CIF number)                                                      | *A12345678*            |\n| Spain                | `eu_vat`     | European VAT number                                                                                     | *ESA1234567Z*          |\n| Sweden               | `eu_vat`     | European VAT number                                                                                     | *SE123456789123*       |\n| Switzerland          | `ch_vat`     | Switzerland VAT number                                                                                  | *CHE-123.456.789 MWST* |\n| Taiwan               | `tw_vat`     | Taiwanese VAT                                                                                           | *12345678*             |\n| Thailand             | `th_vat`     | Thai VAT                                                                                                | *1234567891234*        |\n| Ukraine              | `ua_vat`     | Ukrainian VAT                                                                                           | *123456789*            |\n| United Arab Emirates | `ae_trn`     | United Arab Emirates TRN                                                                                | *123456789012345*      |\n| United Kingdom       | `gb_vat`     | United Kingdom VAT number                                                                               | *GB123456789*          |\n| United Kingdom       | `eu_vat`     | Northern Ireland VAT number                                                                             | *XI123456789*          |\n| United States        | `us_ein`     | Federal Tax Identification Number or EIN. Same value as the counterpart's `tax_id`.                     | *12-3456789*           |",
-      "name": "store-counterpart-vat-id"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-counterpart-vat-id",
+      "readOnlyHint": false,
+      "title": "Store a counterpart VAT ID"
     },
     {
       "description": "Update an existing VAT ID for a counterpart.\nA VAT ID (Value Added Tax Identification Number) is a unique government-issued identification number used for\ntax purposes, specifically for value-added tax. It is assigned to counterparts and helps authorities track and\nmanage tax-related transactions.\nCurrently, VIS42 supports the following VAT ID types:\n| Country              | Type         | Description                                                                                             | Example                |\n| -------------------- | ------------ | ------------------------------------------------------------------------------------------------------- | ---------------------- |\n| Australia            | `au_abn`     | Australian Business Number (AU ABN)                                                                     | *51824753556*          |\n| Australia            | `au_arn`     | Australian Taxation Office Reference Number                                                             | *518247535567*         |\n| Austria              | `eu_vat`     | European VAT number                                                                                     | *ATU12345678*          |\n| Belgium              | `eu_vat`     | European VAT number                                                                                     | *BE0123456789*         |\n| Brazil               | `br_cnpj`    | Brazilian CNPJ number                                                                                   | *28.271.211/0001-88*   |\n| Brazil               | `br_cpf`     | Brazilian CPF number                                                                                    | *137.609.391-04*       |\n| Bulgaria             | `bg_uic`     | Bulgaria Unified Identification Code                                                                    | *123456789*            |\n| Bulgaria             | `eu_vat`     | European VAT number                                                                                     | *BG0123456789*         |\n| Canada               | `ca_bn`      | Canadian BN                                                                                             | *123456789*            |\n| Canada               | `ca_gst_hst` | Canadian GST/HST number                                                                                 | *123456789RT0002*      |\n| Canada               | `ca_pst_bc`  | Canadian PST number (British Columbia)                                                                  | *PST-1234-5678*        |\n| Canada               | `ca_pst_mb`  | Canadian PST number (Manitoba)                                                                          | *123456-7*             |\n| Canada               | `ca_pst_sk`  | Canadian PST number (Saskatchewan)                                                                      | *1234567*              |\n| Canada               | `ca_qst`     | Canadian QST number (Québec)                                                                            | *1234567890TQ1234*     |\n| Chile                | `cl_tin`     | Chilean TIN                                                                                             | *12.345.678-K*         |\n| Croatia              | `eu_vat`     | European VAT number                                                                                     | *HR12345678912*        |\n| Cyprus               | `eu_vat`     | European VAT number                                                                                     | *CY12345678Z*          |\n| Czech Republic       | `eu_vat`     | European VAT number                                                                                     | *CZ1234567890*         |\n| Denmark              | `eu_vat`     | European VAT number                                                                                     | *DK12345678*           |\n| Estonia              | `eu_vat`     | European VAT number                                                                                     | *EE123456789*          |\n| European Union       | `eu_oss_vat` | European One Stop Shop VAT number for non-Union scheme                                                  | *EU123456789*          |\n| Finland              | `eu_vat`     | European VAT number                                                                                     | *FI12345678*           |\n| France               | `eu_vat`     | European VAT number                                                                                     | *FRAB123456789*        |\n| Georgia              | `ge_vat`     | Georgian VAT                                                                                            | *123456789*            |\n| Germany              | `eu_vat`     | European VAT number                                                                                     | *DE123456789*          |\n| Greece               | `eu_vat`     | European VAT number                                                                                     | *EL123456789*          |\n| Hong Kong            | `hk_br`      | Hong Kong BR number                                                                                     | *12345678*             |\n| Hungary              | `hu_tin`     | Hungary tax number (adószám)                                                                            | *12345678-1-23*        |\n| Hungary              | `eu_vat`     | European VAT number                                                                                     | *HU12345678912*        |\n| Iceland              | `is_vat`     | Icelandic VAT                                                                                           | *123456*               |\n| India                | `in_gst`     | Indian GST number                                                                                       | *12ABCDE3456FGZH*      |\n| Indonesia            | `id_npwp`    | Indonesian NPWP number                                                                                  | *12.345.678.9-012.345* |\n| Ireland              | `eu_vat`     | European VAT number                                                                                     | *IE1234567AB*          |\n| Israel               | `il_vat`     | Israel VAT                                                                                              | *12345*                |\n| Italy                | `eu_vat`     | European VAT number                                                                                     | *IT12345678912*        |\n| Japan                | `jp_cn`      | Japanese Corporate Number (Hōjin Bangō)                                                                 | *1234567891234*        |\n| Japan                | `jp_rn`      | Japanese Registered Foreign Businesses' Registration Number (Tōroku Kokugai Jigyōsha no Tōroku Bangō)   | *12345*                |\n| Kenya                | `unknown`    | Kenya Revenue Authority Personal Identification Number (PIN)                                            | *P123456789X*          |\n| Latvia               | `eu_vat`     | European VAT number                                                                                     | *LV12345678912*        |\n| Liechtenstein        | `li_uid`     | Liechtensteinian UID number                                                                             | *CHE123456789*         |\n| Lithuania            | `eu_vat`     | European VAT number                                                                                     | *LT123456789123*       |\n| Luxembourg           | `eu_vat`     | European VAT number                                                                                     | *LU12345678*           |\n| Malaysia             | `my_frp`     | Malaysian FRP number                                                                                    | *12345678*             |\n| Malaysia             | `my_itn`     | Malaysian ITN                                                                                           | *C 1234567890*         |\n| Malaysia             | `my_sst`     | Malaysian SST number                                                                                    | *A12-3456-78912345*    |\n| Malta                | `eu_vat`     | European VAT number                                                                                     | *MT12345678*           |\n| Mexico               | `mx_rfc`     | Mexican RFC number                                                                                      | *ABC010203AB9*         |\n| Netherlands          | `eu_vat`     | European VAT number                                                                                     | *NL123456789B12*       |\n| New Zealand          | `nz_gst`     | New Zealand GST number                                                                                  | *123456789*            |\n| Norway               | `no_vat`     | Norwegian VAT number                                                                                    | *123456789MVA*         |\n| Pakistan             | `unknown`    | Pakistan National Tax Number (NTN) or Registration Number. Same value as the counterpart's `tax_id`.    | *4174941-3*            |\n| Philippines          | `unknown`    | Philippines Taxpayer Identification Number (TIN), if it's registered for VAT.                           | *000123456001*         |\n| Poland               | `eu_vat`     | European VAT number                                                                                     | *PL1234567890*         |\n| Portugal             | `eu_vat`     | European VAT number                                                                                     | *PT123456789*          |\n| Romania              | `eu_vat`     | European VAT number                                                                                     | *RO1234567891*         |\n| Russia               | `ru_inn`     | Russian INN                                                                                             | *1234567891*           |\n| Russia               | `ru_kpp`     | Russian KPP                                                                                             | *123456789*            |\n| Saudi Arabia         | `sa_vat`     | Saudi Arabia VAT                                                                                        | *123456789012345*      |\n| Singapore            | `sg_gst`     | Singaporean GST                                                                                         | *M12345678X*           |\n| Singapore            | `sg_uen`     | Singaporean UEN                                                                                         | *123456789F*           |\n| Slovakia             | `eu_vat`     | European VAT number                                                                                     | *SK1234567891*         |\n| Slovenia             | `si_tin`     | Slovenia tax number (davčna številka)                                                                   | *12345678*             |\n| Slovenia             | `eu_vat`     | European VAT number                                                                                     | *SI12345678*           |\n| South Africa         | `za_vat`     | South African VAT number                                                                                | *4123456789*           |\n| South Korea          | `kr_brn`     | Korean BRN                                                                                              | *123-45-67890*         |\n| Spain                | `es_cif`     | Spanish NIF number (previously Spanish CIF number)                                                      | *A12345678*            |\n| Spain                | `eu_vat`     | European VAT number                                                                                     | *ESA1234567Z*          |\n| Sweden               | `eu_vat`     | European VAT number                                                                                     | *SE123456789123*       |\n| Switzerland          | `ch_vat`     | Switzerland VAT number                                                                                  | *CHE-123.456.789 MWST* |\n| Taiwan               | `tw_vat`     | Taiwanese VAT                                                                                           | *12345678*             |\n| Thailand             | `th_vat`     | Thai VAT                                                                                                | *1234567891234*        |\n| Ukraine              | `ua_vat`     | Ukrainian VAT                                                                                           | *123456789*            |\n| United Arab Emirates | `ae_trn`     | United Arab Emirates TRN                                                                                | *123456789012345*      |\n| United Kingdom       | `gb_vat`     | United Kingdom VAT number                                                                               | *GB123456789*          |\n| United Kingdom       | `eu_vat`     | Northern Ireland VAT number                                                                             | *XI123456789*          |\n| United States        | `us_ein`     | Federal Tax Identification Number or EIN. Same value as the counterpart's `tax_id`.                     | *12-3456789*           |",
-      "name": "update-counterpart-vat-id"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-counterpart-vat-id",
+      "readOnlyHint": false,
+      "title": "Update a counterpart VAT ID"
     },
     {
       "description": "Delete an existing VAT ID for a counterpart.",
-      "name": "destroy-counterpart-vat-id"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-counterpart-vat-id",
+      "readOnlyHint": false,
+      "title": "Destroy a counterpart VAT ID"
     },
     {
       "description": "Create a new address for a counterpart.\nOnly one default address is allowed per counterpart.\nA counterpart can have multiple addresses.",
-      "name": "store-counterpart-address"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "store-counterpart-address",
+      "readOnlyHint": false,
+      "title": "Store a counterpart address"
     },
     {
       "description": "Update an existing address for a counterpart.",
-      "name": "update-counterpart-address"
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "name": "update-counterpart-address",
+      "readOnlyHint": false,
+      "title": "Update a counterpart address"
     },
     {
       "description": "Delete an existing address for a counterpart.",
-      "name": "destroy-counterpart-address"
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "name": "destroy-counterpart-address",
+      "readOnlyHint": false,
+      "title": "Destroy a counterpart address"
     }
   ],
   "compatibility": {

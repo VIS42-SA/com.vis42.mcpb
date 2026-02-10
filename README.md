@@ -70,10 +70,10 @@ Once installed, just ask Claude in natural language:
 | `store-counterpart-organization` | Create a new counterpart (supplier or client). |
 | `store-counterpart-individual` | Create a new counterpart (supplier or client). |
 | `update-counterpart-organization` | Update an existing organization counterpart (business). |
-| `update-counterpart-individual` | Update an existing individual counterpart (person). |
 | `destroy-counterpart` | Delete an existing counterpart (supplier or client). |
 | `store-counterpart-bank-account` | Create a new bank account for a counterpart. |
 | `update-counterpart-bank-account` | Update an existing bank account for a counterpart. |
+| `update-counterpart-individual` | Update an existing individual counterpart (person). |
 | `destroy-counterpart-bank-account` | Delete an existing bank account for a counterpart. |
 | `store-counterpart-contact` | Create a new contact for a counterpart. |
 | `update-counterpart-contact` | Update an existing contact for a counterpart. |
@@ -84,6 +84,7 @@ Once installed, just ask Claude in natural language:
 | `store-counterpart-address` | Create a new address for a counterpart. |
 | `update-counterpart-address` | Update an existing address for a counterpart. |
 | `destroy-counterpart-address` | Delete an existing address for a counterpart. |
+
 
 ## How It Works
 
