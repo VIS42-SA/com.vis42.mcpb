@@ -23,9 +23,11 @@ jobs:
 
             // --- Update manifest.json tools + version ---
             const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
-            const tools = JSON.parse(process.env.TOOLS_JSON);
+            const rawTools = JSON.parse(process.env.TOOLS_JSON);
             const version = process.env.VERSION;
 
+            // Manifest only allows name + description — strip runtime annotations
+            const tools = rawTools.map(t => ({ name: t.name, description: t.description }));
             manifest.tools = tools;
             manifest.version = version;
             fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
