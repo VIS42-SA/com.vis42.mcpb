@@ -16,53 +16,66 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Update manifest.json tools
+      - name: Update manifest.json and README.md
         run: |
           node -e "
             const fs = require('fs');
+
+            // --- Update manifest.json tools + version ---
             const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
             const tools = JSON.parse(process.env.TOOLS_JSON);
+            const version = process.env.VERSION;
+
             manifest.tools = tools;
+            manifest.version = version;
             fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
-            console.log('Updated manifest.json with ' + tools.length + ' tools');
+            console.log('Updated manifest.json with ' + tools.length + ' tools, version ' + version);
+
+            // --- Update server/package.json version ---
+            const serverPkg = JSON.parse(fs.readFileSync('server/package.json', 'utf8'));
+            serverPkg.version = version;
+            fs.writeFileSync('server/package.json', JSON.stringify(serverPkg, null, 2) + '\n');
+
+            // --- Update README.md tools table ---
+            const readme = fs.readFileSync('README.md', 'utf8');
+            const rows = tools.map(t => {
+              // Use first line of description for the table
+              const desc = (t.description || '').split('\n')[0].trim();
+              return '| \`' + t.name + '\` | ' + desc + ' |';
+            });
+            const newTable = '| Tool | Description |\n|------|-------------|\n' + rows.join('\n');
+            const updated = readme.replace(
+              /\| Tool \| Description \|[\s\S]*?(?=\n## )/,
+              newTable + '\n\n'
+            );
+            fs.writeFileSync('README.md', updated);
+            console.log('Updated README.md tools table');
           "
         env:
           TOOLS_JSON: ${{ toJSON(github.event.client_payload.tools) }}
+          VERSION: ${{ github.event.client_payload.version }}
 
       - name: Check for changes
         id: diff
         run: |
-          if git diff --quiet manifest.json; then
+          if git diff --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Commit updated manifest
+      - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json
+          git add manifest.json server/package.json README.md
           git commit -m "sync: update tools from ${{ github.event.client_payload.tag }}"
           git push
 
       - name: Install server dependencies
         if: steps.diff.outputs.changed == 'true'
         run: cd server && npm install --production
-
-      - name: Update version in manifest and package
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          node -e "
-            const fs = require('fs');
-            const version = '${{ github.event.client_payload.version }}';
-            for (const file of ['manifest.json', 'server/package.json']) {
-              const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
-              pkg.version = version;
-              fs.writeFileSync(file, JSON.stringify(pkg, null, 2) + '\n');
-            }
-          "
 
       - name: Build .mcpb bundle
         if: steps.diff.outputs.changed == 'true'

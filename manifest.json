@@ -9,6 +9,29 @@
     "url": "https://github.com/VIS42-SA"
   },
   "license": "MIT",
+  "long_description": "VIS42 is an AI-first financial and revenue management platform, built on top of an agentic system; aim to automate your business administration and focus on what matters most, scale your business. VIS42 vision is to empower entrepreneurs and business owners with a reliable agentic system that will support them in their daily operations, allowing them to focus on growth and innovation. This extension connects Claude Desktop to your VIS42 account, letting you manage your business data through natural language. Create and update clients, suppliers, products, pricing, measure units, bank accounts, contacts, VAT IDs, and addresses — all without leaving Claude.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VIS42-SA/com.vis42.mcpb"
+  },
+  "homepage": "https://vis42.com",
+  "documentation": "https://github.com/VIS42-SA/com.vis42.mcpb#readme",
+  "support": "https://github.com/VIS42-SA/com.vis42.mcpb/issues",
+  "privacy_policies": [
+    "https://vis42.com/privacy-policy"
+  ],
+  "keywords": [
+    "invoicing",
+    "accounting",
+    "business",
+    "counterparts",
+    "products",
+    "payables",
+    "receivables",
+    "GraphQL",
+    "Switzerland",
+    "Italy"
+  ],
   "server": {
     "type": "node",
     "entry_point": "server/index.js",

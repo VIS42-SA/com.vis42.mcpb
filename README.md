@@ -56,34 +56,34 @@ Once installed, just ask Claude in natural language:
 
 | Tool | Description |
 |------|-------------|
-| `get-schema` | Retrieve the GraphQL schema |
-| `query` | Execute a GraphQL query |
-| `store-product` | Create a new product or service |
-| `update-product` | Update a product or service |
-| `destroy-product` | Delete a product or service |
-| `store-product-price` | Create a product price |
-| `update-product-price` | Update a product price |
-| `destroy-product-price` | Delete a product price |
-| `store-measure-unit` | Create a measure unit |
-| `update-measure-unit` | Update a measure unit |
-| `destroy-measure-unit` | Delete a measure unit |
-| `store-counterpart-organization` | Create an organization counterpart |
-| `store-counterpart-individual` | Create an individual counterpart |
-| `update-counterpart-organization` | Update an organization counterpart |
-| `update-counterpart-individual` | Update an individual counterpart |
-| `destroy-counterpart` | Delete a counterpart |
-| `store-counterpart-bank-account` | Add a bank account to a counterpart |
-| `update-counterpart-bank-account` | Update a counterpart bank account |
-| `destroy-counterpart-bank-account` | Delete a counterpart bank account |
-| `store-counterpart-contact` | Add a contact to a counterpart |
-| `update-counterpart-contact` | Update a counterpart contact |
-| `destroy-counterpart-contact` | Delete a counterpart contact |
-| `store-counterpart-vat-id` | Add a VAT ID to a counterpart |
-| `update-counterpart-vat-id` | Update a counterpart VAT ID |
-| `destroy-counterpart-vat-id` | Delete a counterpart VAT ID |
-| `store-counterpart-address` | Add an address to a counterpart |
-| `update-counterpart-address` | Update a counterpart address |
-| `destroy-counterpart-address` | Delete a counterpart address |
+| `get-schema` | Return the complete GraphQL schema in JSON format of the VIS42 app. |
+| `query` | Executes a GraphQL query. |
+| `store-product` | Create a new product or service. |
+| `update-product` | Update an existing product or service. |
+| `destroy-product` | Delete an existing product or service. |
+| `store-product-price` | Create a new price for a product or service. |
+| `update-product-price` | Update an existing price for a product or service. |
+| `destroy-product-price` | Delete an existing price for a product or service. |
+| `store-measure-unit` | Create a new measure unit. |
+| `update-measure-unit` | Update an existing measure unit. |
+| `destroy-measure-unit` | Delete an existing measure unit. |
+| `store-counterpart-organization` | Create a new counterpart (supplier or client). |
+| `store-counterpart-individual` | Create a new counterpart (supplier or client). |
+| `update-counterpart-organization` | Update an existing organization counterpart (business). |
+| `update-counterpart-individual` | Update an existing individual counterpart (person). |
+| `destroy-counterpart` | Delete an existing counterpart (supplier or client). |
+| `store-counterpart-bank-account` | Create a new bank account for a counterpart. |
+| `update-counterpart-bank-account` | Update an existing bank account for a counterpart. |
+| `destroy-counterpart-bank-account` | Delete an existing bank account for a counterpart. |
+| `store-counterpart-contact` | Create a new contact for a counterpart. |
+| `update-counterpart-contact` | Update an existing contact for a counterpart. |
+| `destroy-counterpart-contact` | Delete an existing contact for a counterpart. |
+| `store-counterpart-vat-id` | Create a new VAT ID for a counterpart. |
+| `update-counterpart-vat-id` | Update an existing VAT ID for a counterpart. |
+| `destroy-counterpart-vat-id` | Delete an existing VAT ID for a counterpart. |
+| `store-counterpart-address` | Create a new address for a counterpart. |
+| `update-counterpart-address` | Update an existing address for a counterpart. |
+| `destroy-counterpart-address` | Delete an existing address for a counterpart. |
 
 ## How It Works
 
