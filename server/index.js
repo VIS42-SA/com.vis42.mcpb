@@ -17,75 +17,121 @@ const API_TOKEN = process.env.VIS42_API_TOKEN;
 
 const log = (msg) => process.stderr.write(`[vis42-proxy] ${msg}\n`);
 
-/**
- * Create the remote client transport, trying Streamable HTTP first, falling back to SSE.
- */
-function createRemoteTransport() {
+// Catch everything — these will appear in Claude Desktop logs
+process.on("uncaughtException", (err) => {
+  log(`UNCAUGHT EXCEPTION: ${err.message}\n${err.stack}`);
+  process.exit(1);
+});
+process.on("unhandledRejection", (reason) => {
+  log(`UNHANDLED REJECTION: ${reason instanceof Error ? `${reason.message}\n${reason.stack}` : String(reason)}`);
+  process.exit(1);
+});
+
+log(`Starting proxy — SERVER_URL=${SERVER_URL}`);
+log(`API_TOKEN=${API_TOKEN ? "set (" + API_TOKEN.length + " chars)" : "NOT SET"}`);
+log(`Node.js ${process.version}`);
+
+async function main() {
+  // --- Remote side: MCP Client connecting to VIS42 server ---
   const url = new URL(SERVER_URL);
   const headers = {};
-
   if (API_TOKEN) {
     headers["Authorization"] = `Bearer ${API_TOKEN}`;
   }
 
-  // Try Streamable HTTP first
+  log("Creating remote transport...");
+  let remoteTransport;
   try {
-    return new StreamableHTTPClientTransport(url, {
+    remoteTransport = new StreamableHTTPClientTransport(url, {
       requestInit: { headers },
     });
+    log("Using StreamableHTTP transport.");
   } catch (error) {
-    log(`StreamableHTTP init failed, using SSE fallback: ${error.message}`);
-    return new SSEClientTransport(url, {
+    log(`StreamableHTTP init failed: ${error.message}\n${error.stack}`);
+    log("Falling back to SSE transport...");
+    remoteTransport = new SSEClientTransport(url, {
       requestInit: { headers },
     });
+    log("Using SSE transport.");
   }
-}
 
-async function main() {
-  // --- Remote side: MCP Client connecting to VIS42 server ---
-  const remoteTransport = createRemoteTransport();
   const client = new Client({ name: "vis42-proxy", version: "1.0.0" });
 
+  client.onerror = (error) => {
+    log(`CLIENT ERROR: ${error.message}\n${error.stack || ""}`);
+  };
+
+  client.onclose = () => {
+    log("Remote client connection closed.");
+  };
+
   log("Connecting to remote server...");
-  await client.connect(remoteTransport);
+  try {
+    await client.connect(remoteTransport);
+  } catch (error) {
+    log(`FAILED to connect to remote server: ${error.message}\n${error.stack}`);
+    process.exit(1);
+  }
   log("Connected to remote server.");
 
   const remoteCapabilities = client.getServerCapabilities();
   log(`Remote capabilities: ${JSON.stringify(remoteCapabilities)}`);
 
   // --- Local side: MCP Server exposed to Claude Desktop via stdio ---
+  log("Setting up local stdio server...");
   const localTransport = new StdioServerTransport();
   const server = new Server(
     { name: "vis42", version: "1.0.0" },
     { capabilities: remoteCapabilities ?? {} }
   );
 
+  server.onerror = (error) => {
+    log(`SERVER ERROR: ${error.message}\n${error.stack || ""}`);
+  };
+
   // Proxy: tools/list
   if (remoteCapabilities?.tools) {
+    log("Registering tools proxy handlers...");
     server.setRequestHandler(
       { method: "tools/list" },
       async (request) => {
-        const result = await client.listTools(request.params);
-        return result;
+        log("Proxying tools/list...");
+        try {
+          const result = await client.listTools(request.params);
+          log(`tools/list returned ${result.tools?.length ?? 0} tools.`);
+          return result;
+        } catch (error) {
+          log(`tools/list FAILED: ${error.message}\n${error.stack || ""}`);
+          throw error;
+        }
       }
     );
 
-    // Proxy: tools/call
     server.setRequestHandler(
       { method: "tools/call" },
       async (request) => {
-        const result = await client.callTool(
-          request.params,
-          undefined,
-          { timeout: 120_000 }
-        );
-        return result;
+        log(`Proxying tools/call: ${request.params?.name}...`);
+        try {
+          const result = await client.callTool(
+            request.params,
+            undefined,
+            { timeout: 120_000 }
+          );
+          log(`tools/call ${request.params?.name} completed.`);
+          return result;
+        } catch (error) {
+          log(`tools/call ${request.params?.name} FAILED: ${error.message}\n${error.stack || ""}`);
+          throw error;
+        }
       }
     );
+  } else {
+    log("Remote server has NO tools capability.");
   }
 
-  // Proxy: resources/list
+  // Proxy: resources
   if (remoteCapabilities?.resources) {
+    log("Registering resources proxy handlers...");
     server.setRequestHandler(
       { method: "resources/list" },
       async (request) => {
@@ -93,8 +139,6 @@ async function main() {
         return result;
       }
     );
-
-    // Proxy: resources/read
     server.setRequestHandler(
       { method: "resources/read" },
       async (request) => {
@@ -102,8 +146,6 @@ async function main() {
         return result;
       }
     );
-
-    // Proxy: resources/templates/list
     server.setRequestHandler(
       { method: "resources/templates/list" },
       async (request) => {
@@ -113,8 +155,9 @@ async function main() {
     );
   }
 
-  // Proxy: prompts/list
+  // Proxy: prompts
   if (remoteCapabilities?.prompts) {
+    log("Registering prompts proxy handlers...");
     server.setRequestHandler(
       { method: "prompts/list" },
       async (request) => {
@@ -122,8 +165,6 @@ async function main() {
         return result;
       }
     );
-
-    // Proxy: prompts/get
     server.setRequestHandler(
       { method: "prompts/get" },
       async (request) => {
@@ -140,17 +181,17 @@ async function main() {
     process.exit(0);
   };
 
-  client.onclose = () => {
-    log("Remote client disconnected.");
-    process.exit(0);
-  };
-
-  log("Starting local stdio server...");
-  await server.connect(localTransport);
+  log("Connecting local stdio server...");
+  try {
+    await server.connect(localTransport);
+  } catch (error) {
+    log(`FAILED to start local server: ${error.message}\n${error.stack}`);
+    process.exit(1);
+  }
   log("Proxy ready — bridging stdio ↔ remote server.");
 }
 
 main().catch((error) => {
-  log(`Fatal error: ${error.message}`);
+  log(`FATAL: ${error.message}\n${error.stack}`);
   process.exit(1);
 });
