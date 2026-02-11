@@ -12,6 +12,15 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import {
+  ListToolsRequestSchema,
+  CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
 const SERVER_URL = "https://vis42.com/api/mcp";
 const API_TOKEN = process.env.VIS42_API_TOKEN;
@@ -113,7 +122,7 @@ async function main() {
     log(`SERVER ERROR: ${error.message}\n${error.stack || ""}`);
 
   // --- Proxy: tools ---
-  server.setRequestHandler({ method: "tools/list" }, async (request) => {
+  server.setRequestHandler(ListToolsRequestSchema, async (request) => {
     log("Proxying tools/list...");
     try {
       const client = await getRemoteClient();
@@ -126,7 +135,7 @@ async function main() {
     }
   });
 
-  server.setRequestHandler({ method: "tools/call" }, async (request) => {
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
     log(`Proxying tools/call: ${request.params?.name}...`);
     try {
       const client = await getRemoteClient();
@@ -142,35 +151,32 @@ async function main() {
   });
 
   // --- Proxy: resources ---
-  server.setRequestHandler({ method: "resources/list" }, async (request) => {
+  server.setRequestHandler(ListResourcesRequestSchema, async (request) => {
     log("Proxying resources/list...");
     const client = await getRemoteClient();
     return await client.listResources(request.params);
   });
 
-  server.setRequestHandler({ method: "resources/read" }, async (request) => {
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     log("Proxying resources/read...");
     const client = await getRemoteClient();
     return await client.readResource(request.params);
   });
 
-  server.setRequestHandler(
-    { method: "resources/templates/list" },
-    async (request) => {
-      log("Proxying resources/templates/list...");
-      const client = await getRemoteClient();
-      return await client.listResourceTemplates(request.params);
-    }
-  );
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async (request) => {
+    log("Proxying resources/templates/list...");
+    const client = await getRemoteClient();
+    return await client.listResourceTemplates(request.params);
+  });
 
   // --- Proxy: prompts ---
-  server.setRequestHandler({ method: "prompts/list" }, async (request) => {
+  server.setRequestHandler(ListPromptsRequestSchema, async (request) => {
     log("Proxying prompts/list...");
     const client = await getRemoteClient();
     return await client.listPrompts(request.params);
   });
 
-  server.setRequestHandler({ method: "prompts/get" }, async (request) => {
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
     log("Proxying prompts/get...");
     const client = await getRemoteClient();
     return await client.getPrompt(request.params);
