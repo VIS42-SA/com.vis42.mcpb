@@ -1,6 +1,6 @@
 {
   "name": "vis42-mcp-proxy",
-  "version": "0.0.10",
+  "version": "0.0.8",
   "private": true,
   "type": "module",
   "dependencies": {
