@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "vis42",
   "display_name": "VIS42",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Connect Claude to your VIS42 account. Manage counterparts, products, invoices, payables, and query your business data via GraphQL.",
   "author": {
     "name": "VIS42",
@@ -166,6 +166,86 @@
     {
       "name": "destroy-counterpart-address",
       "description": "Delete an existing address for a counterpart."
+    },
+    {
+      "name": "store-payable",
+      "description": "Create a new payable. Payable are created with the status DRAFT.\nAccounts payable refers to the money a business owes to its suppliers or vendors for products or\nservices that have been received but have yet to be paid for by the company.\nSome of the document types used in accounts payable are:\n- Payable - an invoice that the business receives from its supplier or vendor that lists the products or services\nthe company received and the amount due to the supplier or vendor.\n- Purchase order - a document sent to a supplier or vendor detailing the products or services the company wishes to\npurchase, including quantities and agreed-upon prices. [Not yet supported]\n- Credit notes - reduces the amount due on a payable. [Not yet supported]\nEach payable is allocated with a status that indicates its progress throughout the payable lifecycle, from its\ncreation until its payment."
+    },
+    {
+      "name": "update-payable",
+      "description": "Update an existing payable. Only DRAFT payables can be updated.\nAccounts payable refers to the money a business owes to its suppliers or vendors for products or\nservices that have been received but have yet to be paid for by the company."
+    },
+    {
+      "name": "destroy-payable",
+      "description": "Delete an existing payable.\nA payable can ONLY be deleted when it is in a DRAFT state."
+    },
+    {
+      "name": "mark-as-new-payable",
+      "description": "Set the status of an existing payable to **New**.\n    A payable can only be set to **NEW** when it is in a DRAFT or REFUSED state."
+    },
+    {
+      "name": "approval-payable",
+      "description": "Set the status of an existing payable to **Approval Pending**.\n    A payable can only be set to **APPROVAL PENDING** when it is in a NEW state.\n    When a payable is being set to **APPROVAL PENDING**, an approval request is sent to the approver."
+    },
+    {
+      "name": "approve-payable",
+      "description": "Set the status of an existing payable to **Approved**.\nA payable can only be set to **APPROVED** when it is in an APPROVAL PENDING state.\nWhen a payable is being set to **APPROVED**, it means that the approver has reviewed and approved the payable for payment."
+    },
+    {
+      "name": "refuse-payable",
+      "description": "Set the status of an existing payable to **Refused**.\nA payable can only be set to **REFUSED** when it is in an APPROVAL PENDING state.\nWhen a payable is being set to **REFUSED**, it means that the approver has reviewed and rejected the payable."
+    },
+    {
+      "name": "cancel-payable",
+      "description": "Set the status of an existing payable to **Cancelled**.\nA payable can only be set to **CANCELLED** when it is in an NEW state."
+    },
+    {
+      "name": "mark-as-paid-payable",
+      "description": "Set the status of an existing payable to **Paid**.\n    A payable can only be set to **PAID** when it is in a APPROVED state."
+    },
+    {
+      "name": "store-receivable-invoice",
+      "description": "Create a new receivable invoice. Receivables are created with the status DRAFT.\nAccounts receivable refers to the money owed to a business by its clients for products or\nservices that have been delivered but have yet to be paid for by the clients.\nAn invoice is a request for payment that lists the products or services the business delivered and the amount due.\nEach receivable is allocated with a status that indicates its progress throughout the receivable lifecycle,\nfrom its creation until its payment.\nOnce the receivable invoice is finalized and ISSUED to the counterpart, it cannot be modified. In case changes\nare needed, a credit note must be ISSUED to correct the original receivable invoice, and if necessary, a new receivable invoice can be created.\nA credit note reduces the amount due on an issued receivable invoice.\nPrerequisites\nTo be able to create and issue receivables invoice, a business must have at least:\n- A counterpart: a receivable needs to specify counterpart, which can be an individual or a organization. The counterpart must have at least one billing address.\n- A product or service: a receivable needs to specify at least one line item that specifies the products or services provided to the counterpart.\n- A VAT ID: a receivable needs to specify the VAT ID of the business.\n- A bank account: a receivable also needs to specify the business bank account to which the payment should be made. This bank account must be able to accept the currency reflected on the receivable.\n- A payment term: a receivable also needs to specify the business payment terms, that define the period within which the payment for the receivable must be made."
+    },
+    {
+      "name": "store-receivable-quote",
+      "description": "Create a new receivable quote. Receivables are created with the status DRAFT.\nAccounts receivable refers to the money owed to a business by its clients for products or\nservices that have been delivered but have yet to be paid for by the clients.\nSome of the document types used in accounts receivable are:\nEach receivable is allocated with a status that indicates its progress throughout the receivable lifecycle,\nfrom its creation until its payment.\nPrerequisites\nTo be able to create and issue receivables quote and invoice, a business must have at least:\n- A counterpart: a receivable needs to specify counterpart, which can be an individual or a organization. The counterpart must have at least one billing address.\n- A product or service: a receivable needs to specify at least one line item that specifies the products or services provided to the counterpart.\n- A VAT ID: a receivable needs to specify the VAT ID of the business."
+    },
+    {
+      "name": "update-receivable-invoice",
+      "description": "Update an existing receivable invoice. Invoices can only be updated when they are in DRAFT status.\nAccounts receivable refers to the money owed to a business by its clients for products or\nservices that have been delivered but have yet to be paid for by the clients.\nAn invoice is a request for payment that lists the products or services the business delivered and the amount due.\nEach receivable is allocated with a status that indicates its progress throughout the receivable lifecycle,\nfrom its creation until its payment.\nOnce the receivable invoice is finalized and ISSUED to the counterpart, it cannot be modified. In case changes\nare needed, a credit note must be ISSUED to correct the original receivable invoice, and if necessary, a new receivable invoice can be created.\nA credit note reduces the amount due on an issued receivable invoice."
+    },
+    {
+      "name": "update-receivable-quote",
+      "description": "Update an existing receivable quote. Quotes can only be updated when they are in DRAFT status.\nAccounts receivable refers to the money owed to a business by its clients for products or\nservices that have been delivered but have yet to be paid for by the clients.\nA quote is a formal offer that details how much the products or services will cost before the client commits to a purchase.\nEach receivable is allocated with a status that indicates its progress throughout the receivable lifecycle,\nfrom its creation until its payment.\nPrerequisites\nTo be able to create and issue receivables quote and invoice, a business must have at least:\n- A counterpart: a receivable needs to specify counterpart, which can be an individual or a organization. The counterpart must have at least one billing address.\n- A product or service: a receivable needs to specify at least one line item that specifies the products or services provided to the counterpart.\n- A VAT ID: a receivable needs to specify the VAT ID of the business."
+    },
+    {
+      "name": "destroy-receivable",
+      "description": "Delete an existing receivable.\nA receivable can only be deleted if it is in a DRAFT state."
+    },
+    {
+      "name": "issue-receivable-invoice",
+      "description": "Set the status of an existing receivable invoice to **Issued**.\nA receivable can only be set to **ISSUED** when it is in an DRAFT state.\nWhen a receivable is being set to **ISSUED**, it means that the receivable has been issued to the customer."
+    },
+    {
+      "name": "issue-receivable-quote",
+      "description": "Set the status of an existing receivable quote to **Issued**.\nA receivable can only be set to **ISSUED** when it is in an DRAFT state.\nWhen a receivable is being set to **ISSUED**, it means that the receivable has been issued to the customer."
+    },
+    {
+      "name": "cancel-receivable-invoice",
+      "description": "Set the status of an existing receivable to **Cancelled**.\nA receivable can only be set to **CANCELLED** when it is in an **ISSUED** or **OVERDUE** state.\nWhen a receivable is being set to **CANCELLED**, it means that the receivable is no longer valid and will not be collected."
+    },
+    {
+      "name": "mark-as-paid-receivable-invoice",
+      "description": "Set the status of an existing receivable invoice to **Paid**.\nA receivable can only be set to **PAID** when it is in an ISSUED, OVERDUE, or PARTIALLY_PAID state.\nWhen a receivable is being set to **PAID**, it means that the receivable has been fully paid by the counterparty."
+    },
+    {
+      "name": "mark-as-partially-paid-receivable-invoice",
+      "description": "Set the status of an existing receivable invoice to **Partially Paid**.\nA receivable can only be set to **PARTIALLY PAID** when it is in an ISSUED, OVERDUE, or PARTIALLY_PAID state.\nWhen a receivable is being set to **PARTIALLY PAID**, it means that the receivable has been partially paid by the counterparty."
+    },
+    {
+      "name": "mark-as-uncollectible-receivable-invoice",
+      "description": "Set the status of an existing receivable invoice to **Uncollectible**.\nA receivable can only be set to **UNCOLLECTIBLE** when it is in an ISSUED or OVERDUE state.\nWhen a receivable is being set to **UNCOLLECTIBLE**, it means that the receivable has been partially paid by the counterparty."
     }
   ],
   "compatibility": {

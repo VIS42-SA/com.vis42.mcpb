@@ -84,6 +84,26 @@ Once installed, just ask Claude in natural language:
 | `store-counterpart-address` | Create a new address for a counterpart. |
 | `update-counterpart-address` | Update an existing address for a counterpart. |
 | `destroy-counterpart-address` | Delete an existing address for a counterpart. |
+| `store-payable` | Create a new payable. Payable are created with the status DRAFT. |
+| `update-payable` | Update an existing payable. Only DRAFT payables can be updated. |
+| `destroy-payable` | Delete an existing payable. |
+| `mark-as-new-payable` | Set the status of an existing payable to **New**. |
+| `approval-payable` | Set the status of an existing payable to **Approval Pending**. |
+| `approve-payable` | Set the status of an existing payable to **Approved**. |
+| `refuse-payable` | Set the status of an existing payable to **Refused**. |
+| `cancel-payable` | Set the status of an existing payable to **Cancelled**. |
+| `mark-as-paid-payable` | Set the status of an existing payable to **Paid**. |
+| `store-receivable-invoice` | Create a new receivable invoice. Receivables are created with the status DRAFT. |
+| `store-receivable-quote` | Create a new receivable quote. Receivables are created with the status DRAFT. |
+| `update-receivable-invoice` | Update an existing receivable invoice. Invoices can only be updated when they are in DRAFT status. |
+| `update-receivable-quote` | Update an existing receivable quote. Quotes can only be updated when they are in DRAFT status. |
+| `destroy-receivable` | Delete an existing receivable. |
+| `issue-receivable-invoice` | Set the status of an existing receivable invoice to **Issued**. |
+| `issue-receivable-quote` | Set the status of an existing receivable quote to **Issued**. |
+| `cancel-receivable-invoice` | Set the status of an existing receivable to **Cancelled**. |
+| `mark-as-paid-receivable-invoice` | Set the status of an existing receivable invoice to **Paid**. |
+| `mark-as-partially-paid-receivable-invoice` | Set the status of an existing receivable invoice to **Partially Paid**. |
+| `mark-as-uncollectible-receivable-invoice` | Set the status of an existing receivable invoice to **Uncollectible**. |
 
 
 ## How It Works
