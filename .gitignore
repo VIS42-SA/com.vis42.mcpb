@@ -2,3 +2,4 @@ node_modules/
 *.mcpb
 .DS_Store
 .idea
+.ai
