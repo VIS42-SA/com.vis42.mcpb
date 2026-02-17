@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "vis42",
   "display_name": "VIS42",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Connect Claude to your VIS42 account. Manage counterparts, products, invoices, payables, and query your business data via GraphQL.",
   "author": {
     "name": "VIS42",
