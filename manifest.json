@@ -256,14 +256,5 @@
     "runtimes": {
       "node": ">=18.0.0"
     }
-  },
-  "resources": [
-    {
-      "name": "receivable-invoices-app",
-      "title": "Receivable Invoices App",
-      "description": "Interactive UI for browsing and managing receivable invoices.",
-      "uri": "ui://receivable-invoices-app",
-      "mimeType": "text/html;profile=mcp-app"
-    }
-  ]
+  }
 }
