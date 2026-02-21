@@ -1,8 +1,8 @@
-name: Sync Tools
+name: Sync MCP Server
 
 on:
   repository_dispatch:
-    types: [sync-tools]
+    types: [sync_mcp_server]
   workflow_dispatch:
 
 jobs:
@@ -26,14 +26,36 @@ jobs:
             // --- Update manifest.json tools + version ---
             const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
             const rawTools = JSON.parse(process.env.TOOLS_JSON);
+            const rawResources = JSON.parse(process.env.RESOURCES_JSON || 'null') || [];
+            const rawPrompts = JSON.parse(process.env.PROMPTS_JSON || 'null') || [];
             const version = process.env.VERSION;
 
-            // Manifest only allows name + description — strip runtime annotations
+            // Manifest only allows name + description for tools — strip runtime annotations
             const tools = rawTools.map(t => ({ name: t.name, description: t.description }));
             manifest.tools = tools;
+
+            // Resources: preserve all fields
+            const resources = rawResources.map(r => ({
+              name: r.name,
+              title: r.title,
+              description: r.description,
+              uri: r.uri,
+              mimeType: r.mimeType,
+            }));
+            if (resources.length) manifest.resources = resources; else delete manifest.resources;
+
+            // Prompts: preserve all fields including arguments
+            const prompts = rawPrompts.map(p => ({
+              name: p.name,
+              title: p.title,
+              description: p.description,
+              arguments: p.arguments || [],
+            }));
+            if (prompts.length) manifest.prompts = prompts; else delete manifest.prompts;
+
             manifest.version = version;
             fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
-            console.log('Updated manifest.json with ' + tools.length + ' tools, version ' + version);
+            console.log('Updated manifest.json with ' + tools.length + ' tools, ' + resources.length + ' resources, ' + prompts.length + ' prompts, version ' + version);
 
             // --- Update server/package.json version ---
             const serverPkg = JSON.parse(fs.readFileSync('server/package.json', 'utf8'));
@@ -57,6 +79,8 @@ jobs:
           "
         env:
           TOOLS_JSON: ${{ toJSON(github.event.client_payload.tools) }}
+          RESOURCES_JSON: ${{ toJSON(github.event.client_payload.resources) }}
+          PROMPTS_JSON: ${{ toJSON(github.event.client_payload.prompts) }}
           VERSION: ${{ github.event.client_payload.version }}
 
       - name: Resolve version and tag
