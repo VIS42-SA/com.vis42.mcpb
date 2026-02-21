@@ -25,37 +25,31 @@ jobs:
 
             // --- Update manifest.json tools + version ---
             const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
-            const rawTools = JSON.parse(process.env.TOOLS_JSON);
+            const rawTools     = JSON.parse(process.env.TOOLS_JSON);
             const rawResources = JSON.parse(process.env.RESOURCES_JSON || 'null') || [];
-            const rawPrompts = JSON.parse(process.env.PROMPTS_JSON || 'null') || [];
+            const rawPrompts   = JSON.parse(process.env.PROMPTS_JSON   || 'null') || [];
             const version = process.env.VERSION;
 
-            // Manifest only allows name + description for tools — strip runtime annotations
+            // Tools: strip runtime annotations — manifest only allows name + description
             const tools = rawTools.map(t => ({ name: t.name, description: t.description }));
             manifest.tools = tools;
 
-            // Resources: preserve all fields
-            const resources = rawResources.map(r => ({
-              name: r.name,
-              title: r.title,
-              description: r.description,
-              uri: r.uri,
-              mimeType: r.mimeType,
-            }));
-            if (resources.length) manifest.resources = resources; else delete manifest.resources;
-
-            // Prompts: preserve all fields including arguments
-            const prompts = rawPrompts.map(p => ({
-              name: p.name,
-              title: p.title,
-              description: p.description,
-              arguments: p.arguments || [],
-            }));
+            // Prompts: write to manifest (supported field per MANIFEST.md spec)
+            // Arguments are string names in the manifest schema, not objects
+            const prompts = rawPrompts.map(p => {
+              const entry = { name: p.name, description: p.description };
+              const args = (p.arguments || []).map(a => a.name);
+              if (args.length) entry.arguments = args;
+              return entry;
+            });
             if (prompts.length) manifest.prompts = prompts; else delete manifest.prompts;
+
+            // Resources: not a valid manifest field — log count only; handled by proxy at runtime
+            const resourceCount = rawResources.length;
 
             manifest.version = version;
             fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2) + '\n');
-            console.log('Updated manifest.json with ' + tools.length + ' tools, ' + resources.length + ' resources, ' + prompts.length + ' prompts, version ' + version);
+            console.log('Updated manifest.json with ' + tools.length + ' tools, ' + prompts.length + ' prompts, ' + resourceCount + ' resources (proxy), version ' + version);
 
             // --- Update server/package.json version ---
             const serverPkg = JSON.parse(fs.readFileSync('server/package.json', 'utf8'));
