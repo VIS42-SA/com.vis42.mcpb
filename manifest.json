@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "vis42",
   "display_name": "VIS42",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Connect Claude to your VIS42 account. Manage counterparts, products, invoices, payables, and query your business data via GraphQL.",
   "author": {
     "name": "VIS42",
@@ -256,5 +256,14 @@
     "runtimes": {
       "node": ">=18.0.0"
     }
-  }
+  },
+  "resources": [
+    {
+      "name": "receivable-invoices-app",
+      "title": "Receivable Invoices App",
+      "description": "Interactive UI for browsing and managing receivable invoices.",
+      "uri": "ui://receivable-invoices-app",
+      "mimeType": "text/html;profile=mcp-app"
+    }
+  ]
 }
