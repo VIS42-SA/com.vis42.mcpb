@@ -32,6 +32,30 @@ server.setRequestHandler(ListToolsRequestSchema, async (req) => {
 await connectToRemote(); // this will timeout Claude Desktop
 ```
 
+### SSE Transport Fallback
+
+Transport **constructors never throw**. Errors surface only when `client.connect()` is awaited. The SSE fallback must wrap the `connect()` call:
+
+```js
+// CORRECT — fallback wraps connect(), not the constructor
+const transport = new StreamableHTTPClientTransport(url, { requestInit: { headers } });
+try {
+  await client.connect(transport);
+} catch (err) {
+  log(`StreamableHTTP failed (${err.message}), retrying with SSE...`);
+  const sseTransport = new SSEClientTransport(url, { requestInit: { headers } });
+  await client.connect(sseTransport); // let this throw naturally if SSE also fails
+}
+
+// WRONG — constructor never throws, catch never activates
+try {
+  transport = new StreamableHTTPClientTransport(url, opts);
+} catch (err) {
+  transport = new SSEClientTransport(url, opts); // dead code
+}
+await client.connect(transport);
+```
+
 ### Logging
 
 All log output must go to `stderr`. `stdout` is the MCP protocol channel.
@@ -125,7 +149,7 @@ Use `env:` variables for all payload data. Never interpolate `client_payload` fi
 | `tools_generated` | boolean | Manual | Omit or set false for static tools |
 | `prompts_generated` | boolean | Manual | Omit or set false for static prompts |
 | `user_config` | object | Manual | `api_token` injected as `VIS42_API_TOKEN` |
-| `compatibility` | object | Manual | `node >= 18`, `darwin` + `win32` |
+| `compatibility` | object | Manual | `claude_desktop >= 0.10.0`, `node >= 18`, `darwin` + `win32` |
 
 ## Version Synchronisation
 
@@ -147,6 +171,9 @@ on:
 ## Build and Test
 
 ```bash
+# Run unit tests
+cd server && npm test
+
 # Validate manifest and produce vis42.mcpb
 npx @anthropic-ai/mcpb pack .
 

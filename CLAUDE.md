@@ -15,7 +15,7 @@ A `.mcpb` file is a ZIP archive (spec: [MANIFEST.md](https://github.com/anthropi
 1. A local stdio `Server` starts **immediately** — Claude Desktop's `initialize` handshake is answered without delay
 2. The remote connection to `https://vis42.com/api/mcp` is deferred until the **first real request** (`tools/list`, `tools/call`, etc.)
 3. All seven MCP operations are transparently proxied: `tools/list`, `tools/call`, `resources/list`, `resources/read`, `resources/templates/list`, `prompts/list`, `prompts/get`
-4. Transport negotiation: tries `StreamableHTTPClientTransport` first, falls back to `SSEClientTransport`
+4. Transport negotiation: tries `StreamableHTTPClientTransport` first; if `client.connect()` **throws** (not the constructor — constructors don't throw), falls back to `SSEClientTransport`
 
 **Do not change the proxy architecture.** The lazy connection is critical — a blocking connect on startup causes Claude Desktop to timeout.
 
@@ -43,6 +43,8 @@ The `@anthropic-ai/mcpb pack` tool validates `manifest.json` strictly. Know what
 |---|---|
 | `manifest.json` | Machine-maintained by CI — do not hand-edit tool/prompt/version fields |
 | `server/index.js` | Runtime proxy — runs on end-user machines inside Claude Desktop |
+| `server/lib.js` | Testable core logic (SSE fallback, withLogging, warnIfNoToken) — imported by index.js |
+| `server/lib.test.js` | Unit tests — run with `npm test` inside `server/` |
 | `server/package.json` | Version kept in sync with `manifest.json` by CI |
 | `package.json` | Root — only has the `pack` script |
 | `.github/workflows/sync-tools.yml` | Primary CI — triggers on `sync_mcp_server` dispatch, updates manifest, builds, releases |
@@ -75,6 +77,9 @@ The workflow:
 ## Development Commands
 
 ```bash
+# Run unit tests
+cd server && npm test
+
 # Validate and pack the bundle locally
 npx @anthropic-ai/mcpb pack .
 
@@ -82,7 +87,7 @@ npx @anthropic-ai/mcpb pack .
 cd server && npm install --production
 ```
 
-To test: open the resulting `vis42.mcpb` in Claude Desktop → Settings → Extensions.
+To test end-to-end: open the resulting `vis42.mcpb` in Claude Desktop → Settings → Extensions.
 
 ## Common Pitfalls
 
@@ -91,3 +96,4 @@ To test: open the resulting `vis42.mcpb` in Claude Desktop → Settings → Exte
 - **Version is in two places**: `manifest.json` and `server/package.json` — CI keeps them in sync; never bump one without the other
 - **`manifest.json` is machine-generated** for `tools`, `prompts`, and `version` — edits to those fields will be overwritten on next CI run
 - **All logging in `server/index.js` must go to `stderr`** — stdout is the MCP stdio channel; mixing them corrupts the protocol
+- **SSE fallback triggers on `client.connect()` failure, not constructor failure** — `new StreamableHTTPClientTransport()` never throws; the error surfaces when `connect()` is awaited. The fallback try/catch must wrap `client.connect()`, not the constructor call

@@ -19,6 +19,8 @@ com.vis42.mcpb/
 ├── package.json               # Root package — only contains the pack script
 ├── server/
 │   ├── index.js               # MCP proxy implementation (entry point)
+│   ├── lib.js                 # Testable core logic: SSE fallback, withLogging, warnIfNoToken
+│   ├── lib.test.js            # Unit tests (node --test)
 │   └── package.json           # Server dependencies + version (kept in sync with manifest)
 └── .github/workflows/
     ├── sync-tools.yml         # Primary: triggered by upstream repository_dispatch
@@ -70,7 +72,9 @@ Check [MANIFEST.md](https://github.com/anthropics/mcpb/blob/main/MANIFEST.md) fi
 ### Modifying the proxy (`server/index.js`)
 - Never block the startup path — all remote I/O must happen lazily inside request handlers
 - All logging must use `process.stderr` — stdout is the MCP protocol channel
+- Testable logic lives in `server/lib.js`; `index.js` wires it to the real SDK classes
 - Follow the existing pattern: `getRemoteClient()` → call the SDK method → return the result
+- **SSE fallback**: the transport constructors never throw — errors surface at `client.connect()`. The try/catch for the SSE fallback must therefore wrap the `connect()` call, not the constructor
 
 ### Bumping the version manually
 Update both `manifest.json` (`.version`) and `server/package.json` (`.version`) to the same semver string. They must always match.
@@ -82,6 +86,7 @@ Update both `manifest.json` (`.version`) and `server/package.json` (`.version`) 
 
 ### Testing the bundle
 ```bash
+cd server && npm test                  # Run unit tests (node --test lib.test.js)
 npx @anthropic-ai/mcpb pack .          # Validates manifest and produces vis42.mcpb
 cd server && npm install --production  # Install runtime deps
 ```
@@ -92,4 +97,4 @@ Then install `vis42.mcpb` into Claude Desktop → Settings → Extensions.
 - Node.js ≥ 18.0.0 required (declared in `compatibility.runtimes.node`)
 - Supported platforms: `darwin`, `win32` (no Linux in current manifest)
 - Single runtime dependency: `@modelcontextprotocol/sdk`
-- No test suite exists in this repository
+- Unit tests live in `server/lib.test.js`; run with `cd server && npm test`

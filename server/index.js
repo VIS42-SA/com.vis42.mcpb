@@ -7,6 +7,9 @@
  * 3. Cache the remote connection for subsequent requests
  */
 
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -21,6 +24,10 @@ import {
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { warnIfNoToken, withLogging, buildGetRemoteClient } from './lib.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const { version } = JSON.parse(readFileSync(join(__dirname, 'package.json'), 'utf8'));
 
 const SERVER_URL = "https://vis42.com/api/mcp";
 const API_TOKEN = process.env.VIS42_API_TOKEN;
@@ -42,63 +49,22 @@ process.on("unhandledRejection", (reason) => {
 log(`Starting proxy — SERVER_URL=${SERVER_URL}`);
 log(`API_TOKEN=${API_TOKEN ? "set (" + API_TOKEN.length + " chars)" : "NOT SET"}`);
 log(`Node.js ${process.version}`);
+log(`vis42-proxy v${version}`);
+warnIfNoToken(API_TOKEN, log);
 
 // ---------------------------------------------------------------------------
-// Lazy remote client — connects on first use
+// Lazy remote client
 // ---------------------------------------------------------------------------
-let remoteClient = null;
-let connectPromise = null;
-
-async function getRemoteClient() {
-  if (remoteClient) return remoteClient;
-  if (connectPromise) return connectPromise;
-
-  connectPromise = (async () => {
-    const url = new URL(SERVER_URL);
-    const headers = {};
-    if (API_TOKEN) headers["Authorization"] = `Bearer ${API_TOKEN}`;
-
-    log("Lazy-connecting to remote server...");
-
-    let transport;
-    try {
-      transport = new StreamableHTTPClientTransport(url, {
-        requestInit: { headers },
-      });
-      log("Using StreamableHTTP transport.");
-    } catch (err) {
-      log(`StreamableHTTP init failed (${err.message}), falling back to SSE...`);
-      transport = new SSEClientTransport(url, {
-        requestInit: { headers },
-      });
-      log("Using SSE transport.");
-    }
-
-    const client = new Client({ name: "vis42-proxy", version: "1.0.0" });
-
-    client.onerror = (error) =>
-      log(`CLIENT ERROR: ${error.message}\n${error.stack || ""}`);
-    client.onclose = () => {
-      log("Remote client connection closed.");
-      remoteClient = null;
-      connectPromise = null;
-    };
-
-    try {
-      await client.connect(transport);
-    } catch (err) {
-      log(`FAILED to connect to remote: ${err.message}\n${err.stack}`);
-      connectPromise = null;
-      throw err;
-    }
-
-    log("Connected to remote server.");
-    remoteClient = client;
-    return client;
-  })();
-
-  return connectPromise;
-}
+const getRemoteClient = buildGetRemoteClient({
+  Client,
+  StreamableHTTPClientTransport,
+  SSEClientTransport,
+  serverUrl: SERVER_URL,
+  apiToken: API_TOKEN,
+  log,
+  connectTimeoutMs: 30_000,
+  clientVersion: version,
+});
 
 // ---------------------------------------------------------------------------
 // Local MCP Server — starts IMMEDIATELY on stdio
@@ -108,7 +74,7 @@ async function main() {
 
   const localTransport = new StdioServerTransport();
   const server = new Server(
-    { name: "vis42", version: "1.0.0" },
+    { name: "vis42", version },
     {
       capabilities: {
         tools: {},
@@ -122,74 +88,50 @@ async function main() {
     log(`SERVER ERROR: ${error.message}\n${error.stack || ""}`);
 
   // --- Proxy: tools ---
-  server.setRequestHandler(ListToolsRequestSchema, async (request) => {
-    log("Proxying tools/list...");
-    try {
-      const client = await getRemoteClient();
-      const result = await client.listTools(request.params);
-      log(`tools/list returned ${result.tools?.length ?? 0} tools.`);
-      return result;
-    } catch (error) {
-      log(`tools/list FAILED: ${error.message}`);
-      throw error;
-    }
-  });
+  server.setRequestHandler(ListToolsRequestSchema, withLogging('tools/list', async (request) => {
+    const client = await getRemoteClient();
+    const result = await client.listTools(request.params);
+    log(`tools/list: ${result.tools?.length ?? 0} tools`);
+    return result;
+  }, log));
 
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    log(`Proxying tools/call: ${request.params?.name}...`);
-    try {
-      const client = await getRemoteClient();
-      const result = await client.callTool(request.params, undefined, {
-        timeout: 120_000,
-      });
-      log(`tools/call ${request.params?.name} completed.`);
-      return result;
-    } catch (error) {
-      log(`tools/call ${request.params?.name} FAILED: ${error.message}`);
-      throw error;
-    }
-  });
+  server.setRequestHandler(CallToolRequestSchema, withLogging('tools/call', async (request) => {
+    const name = request.params?.name;
+    log(`tools/call: invoking ${name}`);
+    const client = await getRemoteClient();
+    return await client.callTool(request.params, undefined, { timeout: 120_000 });
+  }, log));
 
   // --- Proxy: resources ---
-  server.setRequestHandler(ListResourcesRequestSchema, async (request) => {
-    log("Proxying resources/list...");
+  server.setRequestHandler(ListResourcesRequestSchema, withLogging('resources/list', async (request) => {
     const client = await getRemoteClient();
     return await client.listResources(request.params);
-  });
+  }, log));
 
-  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    log("Proxying resources/read...");
+  server.setRequestHandler(ReadResourceRequestSchema, withLogging('resources/read', async (request) => {
     const client = await getRemoteClient();
     return await client.readResource(request.params);
-  });
+  }, log));
 
-  server.setRequestHandler(ListResourceTemplatesRequestSchema, async (request) => {
-    log("Proxying resources/templates/list...");
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, withLogging('resources/templates/list', async (request) => {
     const client = await getRemoteClient();
     return await client.listResourceTemplates(request.params);
-  });
+  }, log));
 
   // --- Proxy: prompts ---
-  server.setRequestHandler(ListPromptsRequestSchema, async (request) => {
-    log("Proxying prompts/list...");
+  server.setRequestHandler(ListPromptsRequestSchema, withLogging('prompts/list', async (request) => {
     const client = await getRemoteClient();
     return await client.listPrompts(request.params);
-  });
+  }, log));
 
-  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-    log("Proxying prompts/get...");
+  server.setRequestHandler(GetPromptRequestSchema, withLogging('prompts/get', async (request) => {
     const client = await getRemoteClient();
     return await client.getPrompt(request.params);
-  });
+  }, log));
 
   // --- Shutdown ---
-  server.onclose = async () => {
+  server.onclose = () => {
     log("Local server closed, shutting down...");
-    if (remoteClient) {
-      try {
-        await remoteClient.close();
-      } catch (_) {}
-    }
     process.exit(0);
   };
 

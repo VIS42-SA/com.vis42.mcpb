@@ -3,6 +3,9 @@
   "version": "0.0.15",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node --test lib.test.js"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.1"
   }
