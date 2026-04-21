@@ -56,14 +56,28 @@ Once installed, just ask Claude in natural language:
 
 | Tool | Description |
 |------|-------------|
-| `get-schema` | Return the complete GraphQL schema in JSON format of the VIS42 app. |
+| `get-schema` | Returns the GraphQL schema for the VIS42 app. |
+| `search-schema` | Search the GraphQL schema for a specific type by name or business domain alias. |
 | `query` | Executes a GraphQL query. |
+| `action-store-business` | Create a new business. |
+| `action-update-business` | Update the user's current business details. |
+| `action-store-business-bank-account` | Create a new business bank account. |
+| `action-update-business-bank-account` | Update an existing business bank account. |
+| `action-store-business-vat-id` | Create a new business VAT ID. Required to complete business onboarding. |
+| `action-update-business-vat-id` | Update an existing business VAT ID. |
+| `action-store-business-payment-term` | Create a new business payment term. |
 | `store-product` | Create a new product or service. |
 | `update-product` | Update an existing product or service. |
 | `destroy-product` | Delete an existing product or service. |
 | `store-product-price` | Create a new price for a product or service. |
 | `update-product-price` | Update an existing price for a product or service. |
 | `destroy-product-price` | Delete an existing price for a product or service. |
+| `store-product-barcode` | Create a new barcode for a product. |
+| `update-product-barcode` | Update an existing barcode for a product. |
+| `destroy-product-barcode` | Delete an existing barcode from a product. |
+| `store-product-inventory` | Create inventory tracking for a product. |
+| `update-product-inventory` | Update the inventory record for a product. |
+| `destroy-product-inventory` | Delete the inventory record for a product. |
 | `store-measure-unit` | Create a new measure unit. |
 | `update-measure-unit` | Update an existing measure unit. |
 | `destroy-measure-unit` | Delete an existing measure unit. |
@@ -78,21 +92,32 @@ Once installed, just ask Claude in natural language:
 | `store-counterpart-contact` | Create a new contact for a counterpart. |
 | `update-counterpart-contact` | Update an existing contact for a counterpart. |
 | `destroy-counterpart-contact` | Delete an existing contact for a counterpart. |
-| `store-counterpart-vat-id` | Create a new VAT ID for a counterpart. |
+| `store-counterpart-vat-id` | Create a new VAT ID for a counterpart. A counterpart can have multiple VAT IDs. |
 | `update-counterpart-vat-id` | Update an existing VAT ID for a counterpart. |
-| `destroy-counterpart-vat-id` | Delete an existing VAT ID for a counterpart. |
+| `destroy-counterpart-vat-id` | Delete an existing VAT ID for a counterpart. This removes only the VAT ID record; the counterpart's primary tax_id field is not affected. |
 | `store-counterpart-address` | Create a new address for a counterpart. |
 | `update-counterpart-address` | Update an existing address for a counterpart. |
 | `destroy-counterpart-address` | Delete an existing address for a counterpart. |
-| `store-payable` | Create a new payable. Payable are created with the status DRAFT. |
-| `update-payable` | Update an existing payable. Only DRAFT payables can be updated. |
+| `store-payable-invoice` | Create a new payable invoice. Payable invoices are created with the status DRAFT. |
+| `update-payable-invoice` | Update an existing payable invoice. Only DRAFT payable invoices can be updated. |
+| `mark-as-new-payable-invoice` | Set the status of an existing payable invoice to **New**. |
+| `approval-payable-invoice` | Set the status of an existing payable invoice to **Approval Pending**. |
+| `approve-payable-invoice` | Set the status of an existing payable invoice to **Approved**. |
+| `refuse-payable-invoice` | Set the status of an existing payable invoice to **Refused**. |
+| `cancel-payable-invoice` | Set the status of an existing payable invoice to **Cancelled**. |
+| `mark-as-paid-payable-invoice` | Set the status of an existing payable invoice to **Paid**. |
+| `store-payable-credit-note` | Create a new payable credit note. Payable credit notes are created with the status DRAFT. |
+| `update-payable-credit-note` | Update an existing payable credit note. Only DRAFT payable credit notes can be updated. |
+| `mark-as-new-payable-credit-note` | Set the status of an existing payable credit note to **New**. |
+| `approval-payable-credit-note` | Set the status of an existing payable credit note to **Approval Pending**. |
+| `approve-payable-credit-note` | Set the status of an existing payable credit note to **Approved**. |
+| `reject-payable-credit-note` | Set the status of an existing payable credit note to **Refused**. |
+| `cancel-payable-credit-note` | Set the status of an existing payable credit note to **Cancelled**. |
+| `apply-payable-credit-note` | Apply an existing payable credit note. Applying a credit note transitions it to the **Applied** status. |
 | `destroy-payable` | Delete an existing payable. |
-| `mark-as-new-payable` | Set the status of an existing payable to **New**. |
-| `approval-payable` | Set the status of an existing payable to **Approval Pending**. |
-| `approve-payable` | Set the status of an existing payable to **Approved**. |
-| `refuse-payable` | Set the status of an existing payable to **Refused**. |
-| `cancel-payable` | Set the status of an existing payable to **Cancelled**. |
-| `mark-as-paid-payable` | Set the status of an existing payable to **Paid**. |
+| `store-payable-purchase-order` | Create a new payable purchase order (PO). Purchase orders are created with the status DRAFT. |
+| `update-payable-purchase-order` | Update an existing payable purchase order. Only DRAFT purchase orders can be updated. |
+| `issue-payable-purchase-order` | Set the status of an existing payable purchase order to **Issued**. |
 | `store-receivable-invoice` | Create a new receivable invoice. Receivables are created with the status DRAFT. |
 | `store-receivable-quote` | Create a new receivable quote. Receivables are created with the status DRAFT. |
 | `update-receivable-invoice` | Update an existing receivable invoice. Invoices can only be updated when they are in DRAFT status. |
@@ -104,6 +129,42 @@ Once installed, just ask Claude in natural language:
 | `mark-as-paid-receivable-invoice` | Set the status of an existing receivable invoice to **Paid**. |
 | `mark-as-partially-paid-receivable-invoice` | Set the status of an existing receivable invoice to **Partially Paid**. |
 | `mark-as-uncollectible-receivable-invoice` | Set the status of an existing receivable invoice to **Uncollectible**. |
+| `store-expense-receipt` | Create a new expense receipt. Expense receipts are created with the status DRAFT. |
+| `update-expense-receipt` | Update an existing expense receipt. Only DRAFT expense receipts can be updated. |
+| `destroy-expense` | Delete an existing expense. An expense can only be deleted when it is in a DRAFT state. |
+| `add-expense-line-item` | Add a single line item to an existing expense. |
+| `store-cost-center` | Create a new cost center for the current business. |
+| `list-cost-centers` | List all cost centers for the current business, paginated. |
+| `update-cost-center` | Update an existing cost center. |
+| `list-ledger-accounts` | List all business bank accounts that are connected to the Formance Ledger. |
+| `get-ledger-account-balance` | Get the current balance for a specific business bank account from the Formance Ledger. |
+| `get-ledger-account-volumes` | Get the detailed volume breakdown (input, output, balance) per asset for a specific business bank account. |
+| `list-ledger-transactions` | List transactions for a specific business bank account from the Formance Ledger. |
+| `get-ledger-aggregated-balances` | Get aggregated balances across all accounts in the business ledger. |
+| `get-ledger-stats` | Get aggregate statistics for the business ledger. |
+| `record-ledger-transaction` | Record a financial transaction in the Formance Ledger for a business bank account. |
+| `revert-ledger-transaction` | Revert a previously recorded ledger transaction by its numeric ID. |
+| `create-business-ledger` | Create a Formance Ledger for the current business. |
+| `connect-account-to-ledger` | Connect a business bank account to the Formance Ledger for double-entry bookkeeping. |
+| `link-payment` | Link a ledger transaction to a document (expense, payable, or receivable) as a payment. |
+| `unlink-payment` | Remove a payment link from a document. This hard-deletes the payment link record. |
+| `list-unreconciled` | List documents that are not fully reconciled against ledger transactions. |
+| `suggest-matches` | Suggest ledger transactions that may match a given document. |
+| `get-payment-status` | Get the payment reconciliation status for a document. |
+| `auto-reconcile-batch` | Auto-reconcile all unmatched documents against ledger transactions. |
+| `upload-document-file` | Uploads a document file to storage, and associates it with a document. |
+| `get-document-url` | Allow to retrieves documents URL from storage. Documents can be either receivables or payables. |
+| `document-to-json` | Converts a PDF document to JSON using Google Document AI. |
+| `notification-email` | Sends a notification email to one or more recipients. |
+| `notification-in-app` | Sends an in-app notification to one or more users. |
+| `notification-push` | Sends a push notification to one or more users. |
+| `notification-slack` | Sends a notification message to a Slack channel via an incoming webhook. |
+| `notification-teams` | Sends a notification message to a Microsoft Teams channel via an incoming webhook. |
+| `get-headers` | Returns the column headers and all sheet names from an uploaded spreadsheet file. |
+| `read-sheet` | Reads cell data from an uploaded spreadsheet file (XLSX, XLS, CSV, ODS). |
+| `map-columns` | Maps raw column headers from an uploaded spreadsheet to a set of semantic target field names. |
+| `write-sheet` | Generate a spreadsheet file from structured data and return a pre-signed download URL. |
+| `write-pdf` | Generate a PDF from a pdfmake docDefinition and return a pre-signed download URL. |
 
 
 ## How It Works
